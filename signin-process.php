@@ -1,24 +1,31 @@
 <?php
+session_start();
 
-include 'connection.php'
+if(isset($_POST['SIGN'])){
 
-$conn = mysqli_connect('localhost', 'root', 'root');
-mysqli_select_db($con, 'nimedco-pharmacy');
+$UserName = $_POST['UserName'];
+$Password = $_POST['Password'];
 
-$username = $_POST['UserName'];
-$password = $_POST['Password'];
+$UserName = stripcslashes($UserName);
+$Password = stripcslashes($Password);
+$UserName = mysql_real_escape_string($UserName);
+$Password = mysql_real_escape_string($Password);
 
-$s = "select * from admin where UserName = '$username' && Password = '$password'";
+mysql_connect("localhost", "root", "");
+mysql_select_db("supplier");
 
-$result = mysql_query($conn, $s);
+$result = mysql_query("select * from employee where UserName = '$UserName' and Password = '$Password'") or die("Failed to query database".mysql_error());
 
-$num = mysqli_num_rows($result);
-
-if($num == 1){
-    header('location:Dashboard.php');
+$row = mysql_fetch_array($result);
+if ($row['UserName'] == $UserName && $row['Password'] == $Password){
+    header("location: Dashboard.php");
 } else{
-    header('location:signIn.php');
-}
+    
+    $_SESSION['message'] = "Invalid User Login !!!     Please Enter Valid User Login !!!";
+    $_SESSION['msg_type'] = "danger";
 
+    header("location: signIn.php");
+}
+}
     
 ?>
